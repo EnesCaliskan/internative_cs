@@ -1,0 +1,34 @@
+name: internative_cs
+description: Case Study assignment for Internative
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.14.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  hive: ^2.0.3
+  hive_flutter: ^1.0.0
+  google_fonts: ^1.1.2
+  mobx: ^2.0.4
+  flutter_mobx:
+  http:
+  rxdart:
+  shared_preferences: ^2.0.8
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  build_runner:
+  mobx_codegen:
+  flutter_lints: ^1.0.0
+  hive_generator: ^1.0.1
+
+flutter:
+  uses-material-design: true
