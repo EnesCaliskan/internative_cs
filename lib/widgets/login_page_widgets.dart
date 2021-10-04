@@ -1,13 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:internative_cs/models/login.dart';
-import 'package:internative_cs/models/signIn.dart';
+import 'package:internative_cs/db/Boxes.dart';
+import 'package:internative_cs/db/token.dart';
+import 'package:internative_cs/providers/login_provider.dart';
 import 'package:internative_cs/repository/signIn.dart';
-import 'package:internative_cs/controller/tokenController.dart';
-
-final Login login = Login();
-
+import 'package:provider/provider.dart';
 
 class PageTitle extends StatelessWidget {
   const PageTitle({Key? key}) : super(key: key);
@@ -62,20 +59,18 @@ class _EmailTextFieldState extends State<EmailTextField> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
+    var loginProvider = Provider.of<LoginProvider>(context);
     return Padding(
       padding: const EdgeInsets.only(left:40.0, right: 40.0, top: 10.0, bottom: 25.0),
-      child: Observer(
-        builder: (_) => TextField(
+      child: TextField(
           controller: emailTextController,
           onChanged: (text){
             setState(() {
               _emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(text);
-              login.emailValid = _emailValid;
-              login.email = text;
+              loginProvider.setEmailValid(_emailValid);
+              loginProvider.setEmail(text);
             });
           },
           decoration: InputDecoration(
@@ -93,8 +88,7 @@ class _EmailTextFieldState extends State<EmailTextField> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -123,16 +117,16 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
 
   @override
   Widget build(BuildContext context) {
+    var loginProvider = Provider.of<LoginProvider>(context);
     return Padding(
       padding: const EdgeInsets.only(left:40.0, right: 40.0, top: 10.0, bottom: 30.0),
-      child: Observer(
-        builder: (_) => TextField(
+      child: TextField(
           controller: passwordTextController,
           onChanged: (text){
             setState(() {
               _passwordValid = RegExp(r'(^(?:[+0]9)?[0-9]{1,12}$)').hasMatch(text);
-              login.passwordValid = _passwordValid;
-              login.password = text;
+              loginProvider.setPasswordValid(_passwordValid);
+              loginProvider.setPassword(text);
             });
           },
           obscureText: _isObscure,
@@ -159,8 +153,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
             )
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -172,10 +165,19 @@ class LoginButton extends StatefulWidget {
 }
 
 class _LoginButtonState extends State<LoginButton> {
-  String? token;
 
+  Future addToken(String tokenValue) async {
+    final token = Token()
+        ..tokenValue = tokenValue;
+
+    final box = Boxes.getToken();
+    box.add(token);
+  }
+
+  final myBox = Boxes.getToken();
   @override
   Widget build(BuildContext context) {
+    var loginProvider = Provider.of<LoginProvider>(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -190,19 +192,13 @@ class _LoginButtonState extends State<LoginButton> {
           )
         ],
       ),
-      child: Observer(
-        builder: (_) => TextButton(
+      child: TextButton(
           onPressed: (){
-            if(login.emailValid && login.passwordValid){
+            if(loginProvider.emailValid && loginProvider.passwordValid){
 
-              signIn(login.email, login.password).then((value){
-                //print('value::' + value);
-                setToken(value);
-              });
-
-              getToken().then((value){
-                print('value:::' + value.toString());
-                token = value;
+              signIn(loginProvider.email, loginProvider.password).then((value){
+                addToken(value);
+                loginProvider.setToken(value);
               });
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -227,8 +223,7 @@ class _LoginButtonState extends State<LoginButton> {
               style: TextStyle(fontSize: 20.0),
           ),
         ),
-      ),
-    );
+      );
   }
 
 }

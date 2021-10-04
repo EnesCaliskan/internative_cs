@@ -1,45 +1,48 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:internative_cs/db/Boxes.dart';
 import 'package:internative_cs/models/users.dart';
+import 'package:internative_cs/providers/login_provider.dart';
 import 'package:internative_cs/repository/userFetcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:internative_cs/screens/profile_page.dart';
-import 'package:internative_cs/controller/tokenController.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  final myBox = Boxes.getToken();
   @override
   Widget build(BuildContext context) {
-    getToken().then((value){
-              if(value != ''){
-                token = value!;
-              }
-            });
+    var loginProvider = Provider.of<LoginProvider>(context);
     return Scaffold(
-      body: FutureBuilder<List<User>>(
-          future: fetchUsers(http.Client(), token),
-          builder: (context, snapshot){
-            if(snapshot.hasError) {
-              print('An error has occured! ' + snapshot.error.toString());
-              return Center(child: Text('An error has occured! ' + snapshot.error.toString()));
-            }
-            else if(snapshot.hasData) {
-              return UserList(users: snapshot.data!);
-            }
-            else{
-              return const Center(
-                  child: CircularProgressIndicator(),
-              );
-            }
-          },
-      ),
-    );
+        body: FutureBuilder<List<User>>(
+              future: fetchUsers(http.Client(), loginProvider.token),
+              builder: (context, snapshot){
+                if(snapshot.hasError) {
+                  return Center(child: Text('An error has occurred! ' + snapshot.error.toString()));
+                }
+                else if(snapshot.hasData) {
+                  return UserList(users: snapshot.data!);
+                }
+                else{
+                  return const Center(
+                      child: CircularProgressIndicator(),
+                  );
+                }
+              },
+          ),
+        );
   }
 }
 
@@ -52,6 +55,12 @@ class UserList extends StatefulWidget {
 }
 
 class _UserListState extends State<UserList> {
+
+  Future clearToken() async{
+    final box = Boxes.getToken();
+    box.deleteAll(box.keys);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(

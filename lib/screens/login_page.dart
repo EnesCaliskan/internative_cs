@@ -11,13 +11,11 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-
   @override
   void dispose() {
     Hive.close();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +23,14 @@ class _LoginPageState extends State<LoginPage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                PageTitle(),
-                EmailTextField(),
-                PasswordTextField(),
-                LoginButton(),
-              ],
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              PageTitle(),
+              EmailTextField(),
+              PasswordTextField(),
+              LoginButton(),
+            ],
           ),
         ],
       ),

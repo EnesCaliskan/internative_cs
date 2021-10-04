@@ -14,11 +14,9 @@ dependencies:
   hive: ^2.0.3
   hive_flutter: ^1.0.0
   google_fonts: ^1.1.2
-  mobx: ^2.0.4
-  flutter_mobx:
   http:
   rxdart:
-  shared_preferences: ^2.0.8
+  provider:
 
 
 dev_dependencies:
