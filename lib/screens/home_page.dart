@@ -109,13 +109,30 @@ class _UserListState extends State<UserList> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Users', style: TextStyle(fontSize: 20.0),),
-                IconButton(
-                  onPressed: (){
-                    clearSharedPreferences();
-                    clearToken();
-                    Navigator.popAndPushNamed(context, '/login');
-                  },
-                  icon: Icon(Icons.logout, color: Colors.red),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Logout', style: TextStyle(fontSize: 16.0, color: Colors.white),),
+                        ),
+                        IconButton(
+                          onPressed: (){
+                            clearSharedPreferences();
+                            clearToken();
+                            Navigator.popAndPushNamed(context, '/login');
+                          },
+                          icon: Icon(Icons.logout, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
