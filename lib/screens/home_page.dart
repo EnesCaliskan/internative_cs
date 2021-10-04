@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:internative_cs/db/Boxes.dart';
+import 'package:internative_cs/db/token.dart';
 import 'package:internative_cs/models/users.dart';
 import 'package:internative_cs/providers/login_provider.dart';
 import 'package:internative_cs/repository/userFetcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:internative_cs/screens/profile_page.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,20 +19,48 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  String? tokenPref = '';
+  bool? isLoggedIn = false;
+
+  Future<bool?> getIsLoggedInPrefs() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn');
+  }
+
+  Future<String?> getTokenPrefs() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+
   @override
   void initState() {
+    getIsLoggedInPrefs().then((value){
+      setState(() {
+        isLoggedIn = value;
+      });
+    });
+
+    getTokenPrefs().then((value){
+      setState(() {
+        tokenPref = value;
+      });
+    });
+    print(tokenPref);
     super.initState();
   }
 
   final myBox = Boxes.getToken();
   @override
   Widget build(BuildContext context) {
+
+
     var loginProvider = Provider.of<LoginProvider>(context);
     return Scaffold(
         body: FutureBuilder<List<User>>(
-              future: fetchUsers(http.Client(), loginProvider.token),
+              future: fetchUsers(http.Client(), isLoggedIn != null && true ? tokenPref.toString() : loginProvider.token),
               builder: (context, snapshot){
                 if(snapshot.hasError) {
+                  print('tokenPref' + tokenPref.toString());
                   return Center(child: Text('An error has occurred! ' + snapshot.error.toString()));
                 }
                 else if(snapshot.hasData) {
@@ -61,6 +92,12 @@ class _UserListState extends State<UserList> {
     box.deleteAll(box.keys);
   }
 
+  void clearSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -74,6 +111,7 @@ class _UserListState extends State<UserList> {
                 Text('Users', style: TextStyle(fontSize: 20.0),),
                 IconButton(
                   onPressed: (){
+                    clearSharedPreferences();
                     clearToken();
                     Navigator.popAndPushNamed(context, '/login');
                   },

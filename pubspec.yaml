@@ -17,6 +17,7 @@ dependencies:
   http:
   rxdart:
   provider:
+  shared_preferences:
 
 
 dev_dependencies:

@@ -8,6 +8,7 @@ class LoginProvider with ChangeNotifier{
   late String _email;
   late String _password;
   late String _token;
+  late bool _isLoggedIn;
 
   LoginProvider(){
     _emailValid = false;
@@ -15,6 +16,7 @@ class LoginProvider with ChangeNotifier{
     _email = '';
     _password = '';
     _token = '';
+    _isLoggedIn = false;
   }
 
   //getters
@@ -23,6 +25,7 @@ class LoginProvider with ChangeNotifier{
   String get email => _email;
   String get password => _password;
   String get token => _token;
+  bool get isLoggedIn => _isLoggedIn;
 
   //setters
   void setEmailValid(bool emailValid){
@@ -47,6 +50,11 @@ class LoginProvider with ChangeNotifier{
 
   void setToken(String token){
     _token = token;
+    notifyListeners();
+  }
+
+  void setIsLoggedIn(bool isLoggedIn){
+    _isLoggedIn = isLoggedIn;
     notifyListeners();
   }
 

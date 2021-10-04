@@ -5,4 +5,7 @@ part 'token.g.dart';
 class Token extends HiveObject {
   @HiveField(0)
   late String tokenValue;
+
+  @HiveField(1)
+  late bool isLoggedIn;
 }

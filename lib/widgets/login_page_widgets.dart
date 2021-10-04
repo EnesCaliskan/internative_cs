@@ -5,6 +5,7 @@ import 'package:internative_cs/db/token.dart';
 import 'package:internative_cs/providers/login_provider.dart';
 import 'package:internative_cs/repository/signIn.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PageTitle extends StatelessWidget {
   const PageTitle({Key? key}) : super(key: key);
@@ -166,13 +167,27 @@ class LoginButton extends StatefulWidget {
 
 class _LoginButtonState extends State<LoginButton> {
 
-  Future addToken(String tokenValue) async {
+  bool _isLoggedIn = false;
+
+  void setIsLoggedInPrefs(bool isLoggedIn) async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLoggedIn', isLoggedIn);
+  }
+
+  void setTokenPrefs(String token) async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('token', token);
+  }
+
+  Future addToken(String tokenValue, bool isLoggedIn) async {
     final token = Token()
-        ..tokenValue = tokenValue;
+        ..tokenValue = tokenValue
+        ..isLoggedIn = isLoggedIn;
 
     final box = Boxes.getToken();
     box.add(token);
   }
+
 
   final myBox = Boxes.getToken();
   @override
@@ -195,10 +210,12 @@ class _LoginButtonState extends State<LoginButton> {
       child: TextButton(
           onPressed: (){
             if(loginProvider.emailValid && loginProvider.passwordValid){
-
+              _isLoggedIn = true;
               signIn(loginProvider.email, loginProvider.password).then((value){
-                addToken(value);
+                addToken(value, _isLoggedIn);
                 loginProvider.setToken(value);
+                setIsLoggedInPrefs(_isLoggedIn);
+                setTokenPrefs(value);
               });
 
               ScaffoldMessenger.of(context).showSnackBar(
